@@ -11,12 +11,13 @@ The original Orders Dashboard was functionally fetching data but failing to comm
 - **Benefit**: Confirms activity and provides a "pencil sketch" of the content, reducing perceived wait time.
 
 ### 2. Success State (Rich Table & Metrics)
-- **Problem**: Basic table missing key business data.
+- **Problem**: Basic table missing key business data and summary metrics were incomplete.
 - **Solution**: 
     - Added a **Priority** column with color-coded badges (High, Normal, Low).
-    - Expanded summary metrics to include **Total Orders**, **Total Revenue**, **Delivered**, and **Needs Attention**.
-    - Enhanced table rows with hover effects and consistent typography.
-- **Benefit**: Allows operations managers to scan and prioritize tasks immediately.
+    - Expanded summary metrics to include a full status breakdown: **Total Orders**, **Total Revenue**, **Delivered**, **Shipped**, **Processing**, and **Pending**.
+    - Enhanced table rows with hover effects, consistent typography, and **fade-in animations**.
+    - Added **glassmorphism effects** (glows and shadows) to stat cards for a premium feel.
+- **Benefit**: Allows operations managers to scan and prioritize tasks immediately with real-time certainty.
 
 ### 3. Empty State (Context-Aware)
 - **Problem**: "No data found" is generic and confusing.
@@ -28,6 +29,7 @@ The original Orders Dashboard was functionally fetching data but failing to comm
 ### 4. Error State (Actionable & Specific)
 - **Problem**: Vague "Something went wrong" messages.
 - **Solution**: 
+    - Implemented **Dynamic Error Titles** (e.g., "Service Unavailable" for 503 errors).
     - Displayed the actual error message from the API.
     - Added a prominent error icon and a clear "Retry Connection" button.
     - Preserved the dashboard layout around the error for orientation.
@@ -39,13 +41,14 @@ The original Orders Dashboard was functionally fetching data but failing to comm
 
 ## Technical Details
 - Each UX state is isolated into sub-components (`SkeletonRow`, `OrderRow`, `EmptyState`, `ErrorState`).
-- Smooth transitions handled via conditional rendering in the main `OrdersDashboard` component.
+- Smooth transitions handled via conditional rendering and **CSS keyframe animations**.
 - Used CSS variables for consistent styling (vibrant colors, glassmorphism-inspired cards).
 
 ## Verification
 - Verified each state by modifying the `SIMULATE` constant in `mockApi.js`.
 - Tested search functionality with both existing and non-existent orders.
 - Verified "Clear Filters" recovery path.
+- Confirmed animations and transitions are non-jarring.
 
 ## Deployment
 - Live URL: [Your Deployment URL Here]

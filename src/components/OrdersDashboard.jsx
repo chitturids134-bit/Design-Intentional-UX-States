@@ -147,7 +147,7 @@ function ErrorState({ message, onRetry }) {
           </div>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
-              Connection Failed
+              {message.includes('503') ? 'Service Unavailable' : message.includes('fetch') ? 'Network Error' : 'Connection Failed'}
             </div>
             <div style={{ color: 'var(--text-secondary)', maxWidth: 400, fontSize: 14, lineHeight: 1.6 }}>
               We encountered an error while trying to load your orders. This might be due to a temporary server issue or network problem.
@@ -212,7 +212,9 @@ export default function OrdersDashboard() {
   // DASHBOARD STATS
   const totalRevenue   = orders.reduce((s, o) => s + (o.status !== 'Cancelled' ? o.amount : 0), 0)
   const delivered      = orders.filter(o => o.status === 'Delivered').length
-  const pending        = orders.filter(o => o.status === 'Pending' || o.status === 'Processing').length
+  const shipped        = orders.filter(o => o.status === 'Shipped').length
+  const processing     = orders.filter(o => o.status === 'Processing').length
+  const pending        = orders.filter(o => o.status === 'Pending').length
   const totalOrders    = orders.length
 
   return (
@@ -237,19 +239,36 @@ export default function OrdersDashboard() {
       </div>
 
       {/* ── STAT CARDS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 32 }}>
         {[
-          { label: 'Total Orders',     value: loading ? '—' : totalOrders,                          icon: '📦', color: 'var(--text-primary)' },
-          { label: 'Total Revenue',    value: loading ? '—' : `₹${totalRevenue.toLocaleString()}`, icon: '💰', color: 'var(--accent)'  },
-          { label: 'Delivered',        value: loading ? '—' : delivered,                            icon: '✅', color: 'var(--green)'  },
-          { label: 'Needs Attention',  value: loading ? '—' : pending,                              icon: '⏳', color: 'var(--purple)' },
+          { label: 'Total Orders',     value: loading ? '—' : totalOrders,                          icon: '📦', color: 'var(--text-primary)', glow: '' },
+          { label: 'Total Revenue',    value: loading ? '—' : `₹${totalRevenue.toLocaleString()}`, icon: '💰', color: 'var(--accent)', glow: 'var(--accent-glow)'  },
+          { label: 'Delivered',        value: loading ? '—' : delivered,                            icon: '✅', color: 'var(--green)',  glow: 'var(--green-dim)' },
+          { label: 'Shipped',          value: loading ? '—' : shipped,                              icon: '🚚', color: 'var(--blue)',   glow: 'var(--blue-dim)'  },
+          { label: 'Processing',       value: loading ? '—' : processing,                           icon: '⚙️', color: 'var(--purple)', glow: 'var(--purple-dim)' },
+          { label: 'Pending',          value: loading ? '—' : pending,                              icon: '⏳', color: 'var(--accent)', glow: 'var(--accent-dim)' },
         ].map((card, i) => (
-          <div key={i} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '24px 28px' }}>
+          <div key={i} style={{ 
+            background: 'var(--surface)', 
+            border: '1px solid var(--border)', 
+            borderRadius: 'var(--radius-lg)', 
+            padding: '20px 24px',
+            boxShadow: card.glow ? `0 8px 32px ${card.glow}` : 'none',
+            transition: 'transform 0.2s, box-shadow 0.2s'
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = 'translateY(-4px)'
+            if (card.glow) e.currentTarget.style.boxShadow = `0 12px 40px ${card.glow}`
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            if (card.glow) e.currentTarget.style.boxShadow = `0 8px 32px ${card.glow}`
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>{card.label}</span>
-              <span style={{ fontSize: 20 }}>{card.icon}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>{card.label}</span>
+              <span style={{ fontSize: 18 }}>{card.icon}</span>
             </div>
-            <div style={{ fontSize: 30, fontWeight: 700, color: card.color, fontFamily: 'var(--mono)' }}>{card.value}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: card.color, fontFamily: 'var(--mono)' }}>{card.value}</div>
           </div>
         ))}
       </div>
@@ -333,6 +352,13 @@ export default function OrdersDashboard() {
         @keyframes shimmer {
           0%   { background-position: -200% 0 }
           100% { background-position:  200% 0 }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        tr {
+          animation: fadeIn 0.4s ease-out forwards;
         }
       `}</style>
     </div>
